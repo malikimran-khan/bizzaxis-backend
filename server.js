@@ -96,7 +96,9 @@ app.post("/api/posts", upload.single("image"), async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
+app.get("/api",(req,res)=>{
+  res.send("server is working")
+})
 // GET ALL POSTS
 app.get("/api/posts", async (req, res) => {
   try {
