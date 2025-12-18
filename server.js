@@ -131,7 +131,19 @@ app.delete("/api/posts/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+app.get("/api/posts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    res.json(post);
+  } catch (err) {
+    console.error("FETCH POST ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
 /* ---------------- Test Route ---------------- */
 app.get("/api", (req, res) => {
   res.send("server is working");
