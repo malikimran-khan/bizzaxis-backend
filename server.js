@@ -1,16 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const app = express();
-app.use(express.json()); // parse JSON body
-console.log("server is working");
-const MONGO_URI =
-  "mongodb+srv://malikimranawan801_db_user:bcMrhiPiUxGELOe5@cluster0.6qwy8m0.mongodb.net/simpledb?retryWrites=true&w=majority";
+require("dotenv").config(); // 👈 Load environment variables
 
+const app = express();
+app.use(express.json());
+
+console.log("Server is working");
+
+// -----------------------
+// MongoDB Connection
+// -----------------------
 mongoose
-  .connect(MONGO_URI)
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+// -----------------------
+// Schema & Model
+// -----------------------
 const postSchema = new mongoose.Schema(
   {
     title: {
@@ -32,8 +39,6 @@ const Post = mongoose.model("Post", postSchema);
 // -----------------------
 // APIs
 // -----------------------
-
-// Create post
 app.post("/api/posts", async (req, res) => {
   try {
     const { title, description } = req.body;
@@ -58,11 +63,11 @@ app.post("/api/posts", async (req, res) => {
     });
   }
 });
+
 app.get("/api", (req, res) => {
   res.send("Server is working");
 });
 
-// Get all posts
 app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find().sort({ createdAt: -1 });
@@ -82,7 +87,7 @@ app.get("/api/posts", async (req, res) => {
 // -----------------------
 // Server Listen
 // -----------------------
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
