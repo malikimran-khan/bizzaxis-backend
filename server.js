@@ -40,7 +40,6 @@ const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
@@ -96,9 +95,7 @@ app.post("/api/posts", upload.single("image"), async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-app.get("/api",(req,res)=>{
-  res.send("server is working")
-})
+
 // GET ALL POSTS
 app.get("/api/posts", async (req, res) => {
   try {
@@ -107,6 +104,37 @@ app.get("/api/posts", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+// DELETE POST
+app.delete("/api/posts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // Extract public ID from Cloudinary URL
+    // Example: https://res.cloudinary.com/<cloud>/image/upload/v12345/folder/file.jpg
+    const publicIdMatch = post.image.match(/\/upload\/(?:v\d+\/)?(.+)\.(jpg|jpeg|png)$/i);
+    const publicId = publicIdMatch ? publicIdMatch[1] : null;
+
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+    }
+
+    await post.deleteOne();
+
+    res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    console.error("DELETE ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* ---------------- Test Route ---------------- */
+app.get("/api", (req, res) => {
+  res.send("server is working");
 });
 
 /* ---------------- Global Error Handler ---------------- */
