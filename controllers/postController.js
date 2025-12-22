@@ -3,6 +3,7 @@ const { cloudinary } = require("../middleware/upload");
 
 // CREATE POST
 exports.createPost = async (req, res) => {
+  // console.log(req.body)
   try {
     const { title, description } = req.body;
     const imageUrl = req.file?.path;

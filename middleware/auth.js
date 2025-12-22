@@ -6,6 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret123";
 exports.protect = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1]; // Expect: "Bearer <token>"
+    // console.log(token)
     if (!token) return res.status(401).json({ message: "Not authorized" });
 
     const decoded = jwt.verify(token, JWT_SECRET);
